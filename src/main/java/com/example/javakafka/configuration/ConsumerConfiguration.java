@@ -16,7 +16,7 @@ import java.util.Map;
 public class ConsumerConfiguration {
 
     private static final String KAFKA_BROKER = "172.27.219.86:9092";
-    private static final String GROUP_ID = "kafka-sandbox";
+    private static final String GROUP_ID = "kafka-group";
 
     @Bean
     public ConsumerFactory<String, String> consumerFactory() {

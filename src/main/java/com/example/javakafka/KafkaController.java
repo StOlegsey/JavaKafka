@@ -1,16 +1,18 @@
 package com.example.javakafka;
 
-import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 public class KafkaController {
-
+    //Just for test
     private KafkaTemplate<String, String> template;
     private TopicConsumer myTopicConsumer;
 
@@ -19,10 +21,20 @@ public class KafkaController {
         this.myTopicConsumer = myTopicConsumer;
     }
 
-    @GetMapping("/kafka/produce")
+    @PostMapping("/kafka/produce")
     public void produce(@RequestParam String message, @RequestParam Integer amount) {
         for(int i = 0; i < amount; i++) {
-            template.send("JavaKafka2", message);
+            CompletableFuture<SendResult<String, String>> futureMsg = template.send("JavaToKafka", message);
+            futureMsg.whenComplete((result, ex) -> {
+                if(ex == null){
+                    System.out.println("Sent message=[" + message +
+                            "] with offset=[" + result.getRecordMetadata().offset() + "]");
+                }
+                else {
+                    System.out.println("Unable to send message=[" +
+                            message + "] due to : " + ex.getMessage());
+                }
+            });
         }
     }
 
